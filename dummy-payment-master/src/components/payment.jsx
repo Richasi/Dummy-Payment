@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./Payment.css"; // Import your CSS file for styling
 
 const Payment = () => {
   const [cardNumber, setCardNumber] = useState("");
@@ -10,17 +11,10 @@ const Payment = () => {
   const [isCardNumberLimit, setisCardNumberLimit] = useState(false);
 
   const handleChangeCardNumber = (e) => {
-    let input = e.target.value;
-
-    if (input.length == 4) {
-      input = input + " ";
-    } else if (input.length == 9) {
-      input = input + " ";
-    } else if (input.length == 14) {
-      input = input + " ";
+    let input = e.target.value.replace(/\s/g, "");
+    if (input.length === 4 || input.length === 9 || input.length === 14) {
+      input += " ";
     }
-
-    if (input) console.log(input);
     if (input.length <= 19) {
       setCardNumber(input);
       setisCardNumberLimit(false);
@@ -28,14 +22,15 @@ const Payment = () => {
       setisCardNumberLimit(true);
     }
   };
+
   const handleChangeName = (e) => {
-    let input = e.target.value;
-    setCardName(input);
+    setCardName(e.target.value);
   };
+
   const handleChangeExpiry = (e) => {
-    let input = e.target.value;
-    setExpiry(input);
+    setExpiry(e.target.value);
   };
+
   const handleChangeCvv = (e) => {
     let input = e.target.value;
     if (input.length <= 3) {
@@ -45,73 +40,36 @@ const Payment = () => {
       setCvvlimit(true);
     }
   };
-  console.log(cardNumber);
+
+  const handleCVVFocus = () => {
+    setIsFlipped(true);
+  };
+
+  const handleCVVBlur = () => {
+    setIsFlipped(false);
+  };
+
   return (
-    <div
-      className="cardPay"
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-      }}
-    >
-      <div
-        className="CardFront"
-        style={{
-          height: "200px",
-          width: "350px",
-          borderRadius: "15px",
-          background: "linear-gradient(to right, #72EDF2, #5151E5)",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          color: "white",
-          padding: "20px",
-          boxSizing: "border-box",
-        }}
-      >
-        <p
-          style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "10px" }}
-        >
-          VISA
-        </p>
-        <div
-          className="cardNumber"
-          style={{ fontSize: "18px", marginBottom: "10px" }}
-        >
-          {cardNumber || "#### #### #### ####"}
+    <div className="paymentContainer">
+      <div className={`card ${isFlipped ? "flipped" : ""}`}>
+        <div className="cardFront">
+          <p className="cardType">VISA</p>
+          <div className="cardNumber">{cardNumber || "#### #### #### ####"}</div>
+          <div className="cardName">{cardName || "CARDHOLDER NAME"}</div>
+          <div className="cardExpiry">{expiry || "MM/YY"}</div>
         </div>
-        <div
-          className="cardName"
-          style={{ fontSize: "16px", marginBottom: "10px" }}
-        >
-          {cardName || "CARDHOLDER NAME"}
-        </div>
-        <div
-          className="cardExpiry"
-          style={{ fontSize: "16px", marginBottom: "10px" }}
-        >
-          {expiry || "MM/YY"}
+        <div className="cardBack">
+          <div className="cvvNumber">{CVV || "---"}</div>
         </div>
       </div>
-      <div style={{ marginLeft: "20px" }}>
-        <div className="cvvNumber">{CVV || "---"}</div>
-      </div>
-      <form
-        action=""
-        style={{
-          marginLeft: "20px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-        }}
-      >
+      <form className="formContainer">
         <input
           type="text"
           placeholder="Card Number"
           value={cardNumber}
           onChange={handleChangeCardNumber}
         />
-        {isCardNumberLimit ? <p>Card Number Digits must be 16</p> : " "}
+        {isCardNumberLimit && <p>Card Number Digits must be 16</p>}
         <input
           type="text"
           placeholder="Card Name"
@@ -129,8 +87,10 @@ const Payment = () => {
           placeholder="Card Cvv"
           value={CVV}
           onChange={handleChangeCvv}
+          onFocus={handleCVVFocus}
+          onBlur={handleCVVBlur}
         />
-        {cvvlimit ? <p>CVV limit must be 3</p> : ""}
+        {cvvlimit && <p>CVV limit must be 3</p>}
       </form>
     </div>
   );
